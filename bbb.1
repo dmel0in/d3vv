@@ -1,0 +1,1131 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#6a480c">
+	<meta name="description" content="Descubra qual Big Bag combina com sua carga e operação. Compare modelos e simule o enchimento em 3D.">
+	<title>Ouro Bag | Encontre o Ouro Bag certo para sua carga</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<script type="importmap">
+		{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js" } }
+	</script>
+	<style>
+		:root {
+			color-scheme: light;
+			--forest: #6a480c;
+			--forest-deep: #382405;
+			--leaf: #dfa918;
+			--paper: #f7f3e8;
+			--white: #fffefa;
+			--ink: #1d2924;
+			--muted: #68746e;
+			--line: #e3d8bd;
+			--display: "Barlow Condensed", Impact, sans-serif;
+			--body: "DM Sans", sans-serif;
+		}
+
+		* { box-sizing: border-box; }
+		html { scroll-behavior: smooth; }
+		body { margin: 0; color: var(--ink); background: var(--paper); font-family: var(--body); }
+		a { color: inherit; text-decoration: none; }
+		button, input, select { font: inherit; }
+		button { cursor: pointer; }
+		.wrap { width: min(1160px, calc(100% - 48px)); margin: 0 auto; }
+
+		.topline { height: 34px; background: var(--forest-deep); color: #f1e6cb; font-size: 11px; letter-spacing: .04em; }
+		.topline .wrap { display: flex; align-items: center; justify-content: space-between; height: 100%; }
+		.topline strong { color: var(--leaf); font-weight: 600; }
+		header { position: sticky; z-index: 5; top: 0; background: var(--white); border-bottom: 1px solid var(--line); }
+		.nav { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+		.brand { display: flex; width: 174px; align-items: center; color: var(--forest); flex: 0 0 auto; }
+		.brand-emblem { display: block; width: 100%; height: auto; flex: 0 0 auto; }
+		.logo-definitions { position: absolute; width: 0; height: 0; overflow: hidden; }
+		.nav-links { display: flex; align-items: center; gap: 31px; font-size: 13px; font-weight: 600; }
+		.nav-links a:not(.nav-cta):hover { color: #bf8b08; }
+		.nav-cart { display: inline-flex; align-items: center; gap: 6px; }
+		.nav-cart-count { display: grid; min-width: 20px; height: 20px; place-items: center; padding: 0 5px; color: var(--forest-deep); background: var(--leaf); border-radius: 50%; font-size: 10px; }
+		.nav-cta, .button-primary { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 44px; padding: 0 18px; color: var(--forest-deep); background: var(--leaf); border: 0; font-size: 12px; font-weight: 700; transition: background .2s, transform .2s; }
+		.nav-cta:hover, .button-primary:hover { background: #efc34c; transform: translateY(-2px); }
+
+		.hero { overflow: hidden; color: #fffaf0; background: var(--forest); }
+		.hero-inner { min-height: 408px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 40px; padding-top: 24px; padding-bottom: 24px; }
+		.eyebrow { display: flex; align-items: center; gap: 10px; color: #f1c348; font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+		.eyebrow::before { width: 24px; height: 2px; background: currentColor; content: ""; }
+		h1, h2, h3, p { margin-top: 0; }
+		.hero h1 { max-width: 560px; margin: 18px 0; font-family: var(--display); font-size: 76px; font-weight: 700; line-height: .91; text-transform: uppercase; }
+		.hero h1 span { color: var(--leaf); }
+		.hero-copy { max-width: 420px; margin-bottom: 27px; color: #f0e5cc; font-size: 15px; line-height: 1.7; }
+		.hero-actions { display: flex; align-items: center; gap: 20px; }
+		.text-link { display: inline-flex; align-items: center; gap: 8px; color: #fffaf0; font-size: 12px; font-weight: 600; }
+		.text-link span { color: var(--leaf); font-size: 18px; }
+		.hero-visual { position: relative; min-height: 360px; overflow: hidden; background: #ecebe3; }
+		.hero-visual::before { position: absolute; inset: 16px; border: 1px solid rgba(106,72,12,.2); content: ""; }
+		.hero-slides { position: absolute; inset: 0; }
+		.hero-slide { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; color: inherit; text-decoration: none; cursor: pointer; opacity: 0; visibility: hidden; transition: opacity .55s ease, visibility .55s ease; }
+		.hero-slide.is-active { opacity: 1; visibility: visible; }
+		.hero-slide img { position: relative; z-index: 1; width: 88%; height: 350px; object-fit: contain; mix-blend-mode: multiply; transition: transform .25s; }
+		.hero-slide:hover img { transform: scale(1.025); }
+		.hero-slide:focus-visible { outline: 3px solid var(--forest); outline-offset: -5px; }
+		.photo-label { position: absolute; z-index: 2; right: 22px; bottom: 22px; padding: 10px 13px; color: var(--white); background: var(--forest); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+		.hero-slide-controls { position: absolute; z-index: 3; bottom: 20px; left: 22px; display: flex; align-items: center; gap: 8px; }
+		.hero-slide-dot { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 50%; background: rgba(106,72,12,.35); transition: width .2s, border-radius .2s, background .2s; }
+		.hero-slide-dot.is-active { width: 24px; border-radius: 5px; background: var(--forest); }
+		.hero-slide-arrow { position: absolute; z-index: 3; top: 50%; display: grid; width: 36px; height: 36px; place-items: center; color: var(--forest); background: rgba(255,254,250,.88); border: 0; font-size: 21px; transform: translateY(-50%); transition: background .2s; }
+		.hero-slide-arrow:hover { background: var(--leaf); }
+		.hero-slide-arrow.previous { left: 24px; }
+		.hero-slide-arrow.next { right: 24px; }
+		.finder { padding: 46px 0 50px; background: #f1e8d1; border-bottom: 1px solid #dfcea3; }
+		.finder-heading { max-width: 680px; margin-bottom: 28px; }
+		.finder-heading .eyebrow { color: #8a6508; }
+		.finder-heading h2 { margin: 12px 0 10px; color: var(--forest); font-family: var(--display); font-size: 48px; line-height: .98; text-transform: uppercase; }
+		.finder-heading p { margin: 0; color: #526057; font-size: 15px; line-height: 1.7; }
+		.situation-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+		.situation-option { position: relative; display: flex; min-height: 134px; flex-direction: column; align-items: flex-start; padding: 19px 20px; color: var(--forest); background: var(--white); border: 1px solid #ddd3bd; text-align: left; transition: background .2s, border-color .2s, transform .2s; }
+		.situation-option:hover { border-color: #b1840c; transform: translateY(-2px); }
+		.situation-option[aria-pressed="true"] { background: #fff8e2; border: 2px solid #bd8c0b; padding: 18px 19px; }
+		.situation-index { margin-bottom: 15px; color: #a67b0b; font-family: var(--display); font-size: 18px; font-weight: 700; }
+		.situation-option strong { margin-bottom: 5px; font-size: 16px; }
+		.situation-option > span:last-child { color: #59675e; font-size: 12px; line-height: 1.5; }
+		.recommendation { display: grid; grid-template-columns: minmax(210px, .65fr) 1.35fr; gap: 28px; align-items: center; margin-top: 24px; padding: 24px 0; border-top: 1px solid #d5cba8; border-bottom: 1px solid #d5cba8; }
+		.recommendation[hidden] { display: none; }
+		.recommendation-image { height: 190px; background: #eee8d9; }
+		.recommendation-image img { width: 100%; height: 100%; object-fit: cover; mix-blend-mode: multiply; }
+		.recommendation-label { color: #80600b; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+		.recommendation-copy h3 { margin: 8px 0; color: var(--forest); font-family: var(--display); font-size: 34px; line-height: 1; text-transform: uppercase; }
+		.recommendation-copy p { max-width: 600px; margin-bottom: 17px; color: #4d5c52; font-size: 14px; line-height: 1.7; }
+		.recommendation-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+		.recommendation-actions .button-primary { min-height: 42px; }
+		.recommendation-test { min-height: 42px; padding: 0 16px; color: var(--forest); background: transparent; border: 1px solid var(--forest); font-size: 12px; font-weight: 700; }
+		.recommendation-test:hover { color: #fff; background: var(--forest); }
+		.finder-note { margin: 14px 0 0; color: #5f685f; font-size: 11px; line-height: 1.55; }
+
+		.trust-row { border-bottom: 1px solid var(--line); background: var(--white); }
+		.trust-inner { min-height: 77px; display: grid; grid-template-columns: repeat(3, 1fr); align-items: center; }
+		.trust-item { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 40px; border-right: 1px solid var(--line); }
+		.trust-item:last-child { border: 0; }
+		.trust-icon { color: #a77a06; font-family: var(--display); font-size: 21px; font-weight: 700; }
+		.trust-item strong { display: block; font-size: 12px; }
+		.trust-item small { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; }
+
+		.products { padding: 90px 0 80px; }
+		.section-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 32px; }
+		.section-heading .eyebrow { color: #a77a06; }
+		.section-heading h2 { margin: 10px 0 0; color: var(--forest); font-family: var(--display); font-size: 50px; line-height: .95; text-transform: uppercase; }
+		.section-heading p { max-width: 360px; margin: 0 0 3px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+		.product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 17px; }
+		.product-card { overflow: hidden; border: 1px solid var(--line); background: var(--white); scroll-margin-top: 108px; transition: border-color .2s, transform .2s; }
+		.product-card:hover, .product-card.is-selected { border-color: #c08c0c; transform: translateY(-3px); }
+		.product-photo { position: relative; height: 235px; overflow: hidden; background: #eee8d9; }
+		.product-photo img { width: 100%; height: 100%; object-fit: cover; mix-blend-mode: multiply; transition: transform .35s; }
+		.product-card:hover .product-photo img { transform: scale(1.035); }
+		.product-number { position: absolute; top: 13px; left: 13px; display: grid; width: 28px; height: 28px; place-items: center; color: var(--forest); background: var(--leaf); font-family: var(--display); font-size: 14px; font-weight: 700; }
+		.product-content { padding: 20px 20px 18px; }
+		.product-tag { color: #8a6508; font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+		.product-content h3 { margin: 8px 0; color: var(--forest); font-family: var(--display); font-size: 26px; line-height: 1; text-transform: uppercase; }
+		.product-content p { min-height: 60px; margin-bottom: 17px; color: var(--muted); font-size: 14px; line-height: 1.65; }
+		.test-button { display: flex; width: 100%; align-items: center; justify-content: space-between; min-height: 43px; padding: 0 13px; color: var(--forest); background: transparent; border: 1px solid var(--forest); font-size: 11px; font-weight: 700; text-transform: uppercase; transition: color .2s, background .2s; }
+		.test-button:hover, .is-selected .test-button { color: var(--white); background: var(--forest); }
+		.test-button span { font-size: 17px; }
+		.order-section { padding: 76px 0; background: #f1e8d1; border-top: 1px solid #dfcea3; border-bottom: 1px solid #dfcea3; scroll-margin-top: 90px; }
+		.order-heading { max-width: 720px; margin-bottom: 30px; }
+		.order-heading .eyebrow { color: #8a6508; }
+		.order-heading h2 { margin: 10px 0; color: var(--forest); font-family: var(--display); font-size: 48px; line-height: .98; text-transform: uppercase; }
+		.order-heading p { margin: 0; color: #526057; font-size: 15px; line-height: 1.7; }
+		.order-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr); gap: 34px; align-items: start; }
+		.order-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+		.order-field { display: flex; flex-direction: column; gap: 7px; }
+		.order-field[hidden] { display: none; }
+		.order-field label { color: var(--forest); font-size: 12px; font-weight: 700; }
+		.order-field select, .order-field input, .order-field textarea { width: 100%; min-height: 46px; padding: 10px 12px; color: var(--ink); background: var(--white); border: 1px solid #d7c9a8; border-radius: 0; font-size: 14px; }
+		.order-field textarea { min-height: 86px; resize: vertical; }
+		.order-field select:focus, .order-field input:focus, .order-field textarea:focus { outline: 2px solid #c08c0c; outline-offset: 1px; }
+		.order-field-wide { grid-column: 1 / -1; }
+		.measure-group { min-width: 0; margin: 0; padding: 0; border: 0; }
+		.measure-legend { margin-bottom: 7px; color: var(--forest); font-size: 12px; font-weight: 700; }
+		.measure-custom { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+		.measure-custom[hidden] { display: none; }
+		.measure-fieldset { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+		.measure-control { display: flex; min-width: 0; flex-direction: column; gap: 6px; }
+		.measure-control label { color: #795811; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+		.measure-unit { color: #6b6759; font-size: 10px; }
+		.order-add { display: inline-flex; min-height: 46px; align-items: center; justify-content: center; gap: 8px; padding: 0 17px; color: var(--white); background: var(--forest); border: 0; font-size: 12px; font-weight: 700; }
+		.order-add:hover { background: #81590f; }
+		.order-summary { padding: 24px; color: #fffaf0; background: var(--forest-deep); }
+		.order-summary h3 { margin: 0 0 16px; color: #f0bd35; font-family: var(--display); font-size: 30px; text-transform: uppercase; }
+		.order-lines { display: grid; gap: 10px; }
+		.order-empty { margin: 0; padding: 15px 0; color: #f1e6cb; border-top: 1px solid rgba(241,230,203,.22); border-bottom: 1px solid rgba(241,230,203,.22); font-size: 13px; line-height: 1.6; }
+		.order-line { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 13px 0; border-top: 1px solid rgba(241,230,203,.22); }
+		.order-line h4 { margin: 0 0 4px; color: #fffaf0; font-size: 14px; }
+		.order-line p { margin: 0; color: #dfd0ad; font-size: 11px; line-height: 1.5; }
+		.order-line-actions { display: flex; align-items: center; gap: 12px; }
+		.order-line-price { color: #f0bd35; font-size: 11px; font-weight: 700; white-space: nowrap; }
+		.remove-order-line { width: 30px; height: 30px; color: #fffaf0; background: transparent; border: 1px solid rgba(241,230,203,.35); font-size: 17px; }
+		.remove-order-line:hover { color: var(--forest-deep); background: #f0bd35; }
+		.order-total { display: flex; justify-content: space-between; gap: 12px; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(241,230,203,.35); font-size: 13px; }
+		.order-total strong { color: #f0bd35; font-size: 16px; }
+		.order-minimum { min-height: 36px; margin: 10px 0 0; color: #f1d795; font-size: 11px; line-height: 1.5; }
+		.order-minimum.is-valid { color: #f0bd35; }
+		.order-terms { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 20px; padding-top: 17px; border-top: 1px solid rgba(241,230,203,.22); }
+		.order-terms p { margin: 0; color: #f1e6cb; font-size: 11px; line-height: 1.6; }
+		.order-terms strong { display: block; margin-bottom: 3px; color: #f0bd35; font-size: 10px; text-transform: uppercase; }
+		.order-send { display: flex; width: 100%; min-height: 46px; align-items: center; justify-content: center; gap: 9px; margin-top: 18px; color: var(--forest-deep); background: #f0bd35; border: 0; font-size: 12px; font-weight: 800; }
+		.order-send:hover:not(:disabled) { background: #f4cf67; }
+		.order-send:disabled { opacity: .48; cursor: not-allowed; }
+		.order-disclaimer { margin: 11px 0 0; color: #e2d5b6; font-size: 10px; line-height: 1.55; }
+
+		.simulator { display: none; margin-top: 54px; border-top: 1px solid var(--line); padding-top: 38px; scroll-margin-top: 100px; }
+		.simulator.is-open { display: block; animation: reveal .45s ease both; }
+		@keyframes reveal { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+		.sim-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 20px; }
+		.sim-head .eyebrow { color: #9a700a; }
+		.sim-head h3 { margin: 8px 0 0; color: var(--forest); font-family: var(--display); font-size: 34px; text-transform: uppercase; }
+		.sim-model-description { max-width: 680px; margin: 8px 0 0; color: #59675e; font-size: 13px; line-height: 1.55; }
+		.sim-model-switch { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+		.sim-model-button { min-height: 34px; padding: 0 12px; color: var(--forest); background: transparent; border: 1px solid #ded3bb; font-size: 11px; font-weight: 700; transition: color .2s, background .2s, border-color .2s; }
+		.sim-model-button:hover { border-color: var(--forest); }
+		.sim-model-button[aria-pressed="true"] { color: var(--white); background: var(--forest); border-color: var(--forest); }
+		.close-sim { width: 38px; height: 38px; color: var(--forest); background: transparent; border: 1px solid var(--line); font-size: 20px; }
+		.sim-layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(280px, .75fr); min-height: 465px; border: 1px solid var(--line); background: var(--white); }
+		.scene-wrap { position: relative; min-height: 465px; overflow: hidden; background: #eee7d6; }
+		.scene-wrap canvas { display: block; width: 100%; height: 100%; min-height: 465px; touch-action: none; }
+		.scene-badge { position: absolute; top: 15px; left: 15px; display: flex; align-items: center; gap: 8px; padding: 8px 10px; color: var(--forest); background: rgba(255,254,250,.88); font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; pointer-events: none; }
+		.scene-badge::before { width: 7px; height: 7px; border-radius: 50%; background: #c58e0c; content: ""; }
+		.scene-help { position: absolute; right: 15px; bottom: 13px; color: #516158; font-size: 10px; pointer-events: none; }
+		.sim-controls { display: flex; flex-direction: column; padding: 25px 25px 21px; }
+		.control-label { display: block; margin-bottom: 9px; color: var(--forest); font-size: 11px; font-weight: 700; }
+		.quantity-value { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
+		.quantity-value output { color: var(--forest); font-family: var(--display); font-size: 42px; font-weight: 700; line-height: 1; }
+		.quantity-value small { color: var(--muted); font-size: 10px; }
+		input[type="range"] { width: 100%; height: 5px; margin: 13px 0 7px; accent-color: #bf8b08; cursor: pointer; }
+		.range-labels { display: flex; justify-content: space-between; color: var(--muted); font-size: 9px; }
+		.grain-select { width: 100%; height: 42px; padding: 0 11px; color: var(--ink); background: #f7f8f3; border: 1px solid var(--line); font-size: 12px; }
+		.control-group { margin-top: 24px; }
+		.fill-meter { height: 6px; margin-top: auto; overflow: hidden; background: #e7e9e3; }
+		.fill-meter span { display: block; width: 55%; height: 100%; background: var(--leaf); transition: width .25s; }
+		.sim-note { margin: 10px 0 0; color: var(--muted); font-size: 10px; line-height: 1.55; }
+		.sim-spec { display: flex; align-items: center; justify-content: space-between; margin: 21px 0 13px; padding-bottom: 14px; border-bottom: 1px solid var(--line); font-size: 11px; }
+		.sim-spec strong { color: var(--forest); }
+		.quote-link { display: flex; align-items: center; justify-content: center; min-height: 43px; margin-top: 17px; color: var(--white); background: var(--forest); font-size: 11px; font-weight: 700; text-transform: uppercase; transition: background .2s; }
+		.quote-link:hover { background: #28614e; }
+
+		.about-band { background: #eee5d1; }
+		.about-inner { padding-top: 72px; padding-bottom: 72px; }
+		.about-intro { display: grid; grid-template-columns: .85fr 1.15fr; gap: 60px; align-items: center; padding-bottom: 36px; }
+		.about-identity { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; text-align: center; }
+		.brand-emblem-large { display: block; width: min(100%, 410px); height: auto; flex: 0 0 auto; filter: drop-shadow(0 5px 3px rgba(57,38,6,.16)); }
+		.about-copy .eyebrow { color: #90680c; }
+		.about-copy h2 { margin: 0; color: var(--forest); font-family: var(--display); font-size: 38px; line-height: .96; text-transform: uppercase; }
+		.about-intro > p { max-width: 650px; margin: 0; color: #46564d; font-size: 16px; line-height: 1.8; }
+		.company-profile { display: grid; grid-template-columns: .45fr 1.55fr; gap: 40px; align-items: start; padding: 24px 0 28px; border-top: 1px solid rgba(106,72,12,.2); border-bottom: 1px solid rgba(106,72,12,.2); }
+		.company-profile h3 { margin: 0; color: var(--forest); font-family: var(--display); font-size: 30px; text-transform: uppercase; }
+		.company-profile p { max-width: 780px; margin: 0; color: #46564d; font-size: 15px; line-height: 1.8; }
+		.purpose-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding-top: 24px; }
+		.purpose-item { min-height: 170px; padding: 24px 26px; color: var(--white); background: var(--forest); }
+		.purpose-item:last-child { color: var(--forest); background: var(--leaf); }
+		.purpose-label { display: block; margin-bottom: 19px; color: #f1c348; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+		.purpose-item:last-child .purpose-label { color: var(--forest); }
+		.purpose-item h3 { margin-bottom: 8px; font-family: var(--display); font-size: 30px; line-height: 1; text-transform: uppercase; }
+		.purpose-item p { max-width: 480px; margin: 0; color: #f0e5cc; font-size: 14px; line-height: 1.75; }
+		.purpose-item:last-child p { color: #49350d; }
+		footer { padding: 28px 0; color: #f1e6cb; background: var(--forest-deep); }
+		.footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 22px; font-size: 10px; }
+		.footer-inner strong { color: var(--leaf); }
+		.footer-links { display: flex; gap: 20px; }
+		.whatsapp-float { position: fixed; z-index: 12; right: 24px; bottom: 24px; display: grid; width: 60px; height: 60px; place-items: center; color: #fff; background: #20c766; border: 2px solid rgba(255,255,255,.9); border-radius: 50%; box-shadow: 0 5px 18px rgba(12,43,35,.25); transition: transform .2s, background .2s, box-shadow .2s; }
+		.whatsapp-float:hover { background: #17ae56; box-shadow: 0 7px 22px rgba(12,43,35,.32); transform: translateY(-3px); }
+		.whatsapp-float:focus-visible { outline: 3px solid #dfa918; outline-offset: 3px; }
+		.whatsapp-float svg { width: 34px; height: 34px; }
+
+		@media (max-width: 800px) {
+			.nav { gap: 14px; }
+			.nav-links { gap: 14px; }
+			.nav-links a:first-child, .nav-links a:nth-child(2), .nav-links a:nth-child(3) { display: none; }
+			.nav-cta { padding: 0 12px; font-size: 11px; }
+			.hero-inner { min-height: 0; grid-template-columns: 1fr; gap: 30px; padding-top: 52px; padding-bottom: 34px; }
+			.hero-visual { min-height: 330px; }
+			.hero-slide img { height: 290px; }
+			.product-grid { grid-template-columns: 1fr 1fr; }
+			.product-card:last-child { grid-column: span 2; }
+			.product-card:last-child .product-photo { height: 260px; }
+			.sim-layout { grid-template-columns: 1fr; }
+			.sim-controls { min-height: 310px; }
+			.about-intro { grid-template-columns: 1fr; gap: 18px; }
+			.company-profile { grid-template-columns: 1fr; gap: 10px; }
+			.situation-options { grid-template-columns: 1fr; }
+			.situation-option { min-height: 104px; }
+			.recommendation { grid-template-columns: 1fr; gap: 18px; }
+			.recommendation-image { height: 240px; }
+			.order-layout { grid-template-columns: 1fr; }
+		}
+		@media (max-width: 560px) {
+			.wrap { width: min(100% - 32px, 1160px); }
+			.topline .wrap { justify-content: center; }
+			.topline span:last-child { display: none; }
+			.nav { min-height: 66px; }
+			.nav-links { gap: 13px; font-size: 11px; }
+			.nav-links a:first-child, .nav-links a:nth-child(2), .nav-links a:nth-child(3) { display: none; }
+			.nav-links { gap: 10px; }
+			.nav-cart { font-size: 10px; }
+			.nav-cta { min-height: 37px; padding: 0 11px; font-size: 10px; }
+			.brand { width: 128px; }
+			.hero h1 { font-size: 61px; }
+			.hero-copy { font-size: 13px; }
+			.finder { padding: 52px 0 44px; }
+			.finder-heading h2 { font-size: 40px; }
+			.finder-heading p { font-size: 14px; }
+			.situation-option { min-height: 98px; padding: 16px; }
+			.situation-option[aria-pressed="true"] { padding: 15px; }
+			.situation-index { margin-bottom: 9px; }
+			.recommendation-image { height: 205px; }
+			.recommendation-copy h3 { font-size: 30px; }
+			.recommendation-actions { align-items: stretch; flex-direction: column; }
+			.order-section { padding: 52px 0; }
+			.order-heading h2 { font-size: 40px; }
+			.order-heading p { font-size: 14px; }
+			.order-form { grid-template-columns: 1fr; gap: 13px; }
+			.order-field-wide { grid-column: auto; }
+			.measure-fieldset { gap: 8px; }
+			.measure-control input { padding-right: 7px; padding-left: 8px; }
+			.order-summary { padding: 20px 17px; }
+			.order-terms { grid-template-columns: 1fr; }
+			.hero-visual { min-height: 275px; }
+			.hero-slide img { height: 240px; }
+			.photo-label { right: 13px; bottom: 15px; padding: 9px 10px; font-size: 8px; }
+			.hero-slide-controls { bottom: 17px; left: 14px; }
+			.hero-slide-arrow.previous { left: 13px; }
+			.hero-slide-arrow.next { right: 13px; }
+			.trust-inner { min-height: 72px; grid-template-columns: repeat(3, 1fr); }
+			.trust-item { gap: 5px; padding: 0 3px; }
+			.trust-icon { font-size: 17px; }
+			.trust-item strong { font-size: 9px; }
+			.trust-item small { font-size: 8px; }
+			.products { padding: 64px 0 58px; }
+			.section-heading { display: block; margin-bottom: 23px; }
+			.section-heading h2 { font-size: 43px; }
+			.section-heading p { margin-top: 12px; font-size: 12px; }
+			.product-grid { grid-template-columns: 1fr; gap: 13px; }
+			.product-card:last-child { grid-column: auto; }
+			.product-photo, .product-card:last-child .product-photo { height: 230px; }
+			.product-content p { min-height: 0; }
+			.simulator { margin-top: 40px; padding-top: 28px; }
+			.sim-head h3 { font-size: 29px; }
+			.scene-wrap, .scene-wrap canvas { min-height: 350px; }
+			.sim-controls { padding: 22px 18px 18px; }
+			.about-inner { padding-top: 48px; padding-bottom: 48px; }
+			.about-intro { gap: 20px; padding-bottom: 23px; }
+			.about-identity { gap: 2px; }
+			.brand-emblem-large { width: min(100%, 380px); }
+			.about-copy h2 { font-size: 34px; }
+			.about-intro > p { font-size: 15px; }
+			.company-profile { gap: 7px; padding: 20px 0 22px; }
+			.company-profile h3 { font-size: 26px; }
+			.company-profile p { font-size: 14px; }
+			.purpose-grid { grid-template-columns: 1fr; gap: 11px; }
+			.purpose-item { min-height: 0; padding: 21px; }
+			.purpose-item p { font-size: 14px; }
+			.purpose-label { margin-bottom: 14px; }
+			.whatsapp-float { right: 16px; bottom: 16px; width: 56px; height: 56px; }
+			.whatsapp-float svg { width: 32px; height: 32px; }
+			.footer-inner { align-items: flex-start; flex-direction: column; }
+		}
+		@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+	</style>
+</head>
+<body>
+	<svg class="logo-definitions" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+		<symbol id="ouro-bag-emblem" viewBox="0 0 260 250">
+			<path d="M42 42c0-19 12-31 27-31h8c17 0 27 13 27 31v27H91V43c0-9-5-15-14-15h-7c-8 0-14 6-14 15v29H42Zm111 0c0-19 11-31 27-31h8c15 0 27 12 27 31v30h-14V43c0-9-6-15-14-15h-7c-9 0-14 6-14 15v26h-13Z" fill="#034a29" stroke="#dca20c" stroke-width="5" stroke-linejoin="round"/>
+			<path d="M40 64c18 10 43 16 88 16s70-6 92-16l10 127c2 26-13 42-40 47-39 7-91 7-130 0-27-5-42-21-40-47L40 64Z" fill="#034a29" stroke="#dca20c" stroke-width="6" stroke-linejoin="round"/>
+			<path d="M55 83c21 7 44 11 73 11s54-4 77-11l8 98c-30 15-58 23-85 23s-56-8-85-23l12-98Z" fill="#034a29" stroke="#082717" stroke-width="4"/>
+			<path d="M77 139a52 52 0 0 1 102 0Z" fill="#e3a900"/>
+			<path d="M83 134 65 115l27 12 4-27 14 24 12-38 8 38 25-28-13 34 35-19-26 28Z" fill="#e3a900"/>
+			<path d="M57 145c25-8 47-10 71-7 27 3 49 12 80 22M56 160c25-6 45-4 69 3 25 7 48 18 84 25M57 177c25-1 44 5 66 14 19 8 36 15 59 17" fill="none" stroke="#e3a900" stroke-width="9"/>
+			<path d="M128 157c-1-24 2-39 10-54m-9 43c-18-4-29-14-34-30 17 2 29 10 36 25m7-21c4-18 15-30 32-36 0 20-9 34-27 44m-12 31c-16-11-25-23-28-38m30 32c14-11 23-22 29-37" fill="none" stroke="#034a29" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+			<path d="M128 157c-1-24 2-39 10-54m-9 43c-18-4-29-14-34-30 17 2 29 10 36 25m7-21c4-18 15-30 32-36 0 20-9 34-27 44" fill="none" stroke="#d9a114" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+			<path d="M47 71c-11 41-15 84-10 118 2 17 8 29 22 37m142 0c14-8 20-20 22-37 5-34 1-77-10-118" fill="none" stroke="#e3a900" stroke-width="5"/>
+			<path d="M57 220c44 19 103 21 146 0" fill="none" stroke="#e3a900" stroke-width="7" stroke-linecap="round"/>
+		</symbol>
+		<symbol id="ouro-bag-wordmark" viewBox="0 0 760 260">
+			<use href="#ouro-bag-emblem" x="14" y="5" width="250" height="250"/>
+			<text x="292" y="139" fill="#e2a900" font-family="Arial, sans-serif" font-size="111" font-weight="800" letter-spacing="-3">OURO</text>
+			<text x="300" y="222" fill="#07512f" font-family="Arial, sans-serif" font-size="99" font-weight="800" letter-spacing="-2">BAG</text>
+		</symbol>
+	</svg>
+	<div class="topline"><div class="wrap"><span>O Ouro Bag certo para cada situação</span><span><strong>Hortolândia, SP</strong> · Atendimento em todo o Brasil</span></div></div>
+	<header>
+		<nav class="nav wrap" aria-label="Navegação principal">
+			<a class="brand" href="#inicio" aria-label="Ouro Bag, início"><svg class="brand-emblem" viewBox="0 0 760 260" aria-hidden="true"><use href="#ouro-bag-wordmark"></use></svg></a>
+			<div class="nav-links"><a href="#escolha">Encontre seu Ouro Bag</a><a href="#produtos">Modelos</a><a href="#empresa">A Ouro Bag</a><a class="nav-cart" href="#pedido">Carrinho <span class="nav-cart-count" id="nav-cart-count">0</span></a><a class="nav-cta" href="https://api.whatsapp.com/send?phone=5519981169539" target="_blank" rel="noreferrer">Fale com um especialista <span aria-hidden="true">↗</span></a></div>
+		</nav>
+	</header>
+
+	<main>
+		<section class="hero" id="inicio">
+			<div class="hero-inner wrap">
+				<div>
+					<div class="eyebrow">Escolha com confiança</div>
+					<h1>Oferecemos Big Bags <span>Seguros</span> e de <span>qualidades.</span></h1>
+					<p class="hero-copy">Compare os modelos pela carga, pelo enchimento e pela forma de descarga da sua operação.</p>
+					<div class="hero-actions"><a class="button-primary" href="#escolha">Encontrar meu Big Bag <span aria-hidden="true">↓</span></a><a class="text-link" href="https://api.whatsapp.com/send?phone=5519981169539" target="_blank" rel="noreferrer">Tirar dúvidas com a equipe <span aria-hidden="true">↗</span></a></div>
+				</div>
+				<div class="hero-visual" id="hero-carousel" aria-label="Modelos de Big Bag">
+					<div class="hero-slides" aria-live="polite">
+						<a class="hero-slide is-active" href="#produto-saia" aria-label="Ver Big Bag com saia superior" aria-hidden="false"><img src="https://www.bigbagbandeirantes.com.br/img/produtos/bigbag-saia-superior.jpg" alt="Big Bag com saia superior"><span class="photo-label">Com saia superior</span></a>
+						<a class="hero-slide" href="#produto-valvulas" aria-label="Ver Big Bag com válvulas" aria-hidden="true" tabindex="-1"><img src="https://www.bigbagbandeirantes.com.br/img/produtos/bigbag-valvulas.jpg" alt="Big Bag com válvulas superior e inferior"><span class="photo-label">Com válvulas</span></a>
+						<a class="hero-slide" href="#produto-travado" aria-label="Ver Big Bag travado convencional" aria-hidden="true" tabindex="-1"><img src="https://www.bigbagbandeirantes.com.br/img/produtos/bigbag-travado.jpg" alt="Big Bag travado convencional"><span class="photo-label">Travado convencional</span></a>
+					</div>
+					<button class="hero-slide-arrow previous" type="button" aria-label="Ver modelo anterior">‹</button>
+					<button class="hero-slide-arrow next" type="button" aria-label="Ver próximo modelo">›</button>
+					<div class="hero-slide-controls" aria-label="Selecionar modelo">
+						<button class="hero-slide-dot is-active" type="button" aria-label="Mostrar modelo com saia superior" aria-current="true"></button>
+						<button class="hero-slide-dot" type="button" aria-label="Mostrar modelo com válvulas" aria-current="false"></button>
+						<button class="hero-slide-dot" type="button" aria-label="Mostrar modelo travado convencional" aria-current="false"></button>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="finder" id="escolha" aria-labelledby="finder-title">
+			<div class="finder-inner wrap">
+				<div class="finder-heading"><div class="eyebrow">Comece pela sua necessidade</div><h2 id="finder-title">Como podemos te ajudar?</h2><p>A Ouro Bag atua na fabricação de Contentores Flexíveis (Big Bags), confeccionados em tecido de Polipropileno de alta qualidade e durabilidade, garantindo a segurança no armazenamento dos produtos.</p></div>
+				<div class="situation-options" role="group" aria-label="Selecione a situação da sua carga">
+					<button class="situation-option" type="button" data-situation="skirt" aria-pressed="false"><span class="situation-index">1. Fertilizantes</span></button>
+					<button class="situation-option" type="button" data-situation="valves" aria-pressed="false"><span class="situation-index">2. Sementes em geral</span></button>
+					<button class="situation-option" type="button" data-situation="locked" aria-pressed="false"><span class="situation-index">3. Mineral</span></button>
+					<button class="situation-option" type="button" data-situation="locked" aria-pressed="false"><span class="situation-index">4. Alimentício</span></button>
+
+					
+				</div>
+				<div class="recommendation" id="recommendation" hidden aria-live="polite">
+					<div class="recommendation-image"><img id="recommendation-image" src="" alt=""></div>
+					<div class="recommendation-copy"><span class="recommendation-label">Ponto de partida sugerido</span><h3 id="recommendation-title"></h3><p id="recommendation-reason"></p><div class="recommendation-actions"><a class="button-primary" id="recommendation-details" href="#produtos">Ver detalhes do modelo</a><button class="recommendation-test" id="recommendation-test" type="button">Experimentar no simulador 3D</button></div></div>
+				</div>
+				<p class="finder-note">Esta sugestão inicial é baseada nas aplicações dos modelos. Confirme requisitos de segurança, capacidade e dimensões com nossa equipe.</p>
+			</div>
+		</section>
+
+		<section class="trust-row" aria-label="Como escolher">
+			<div class="trust-inner wrap">
+				<div class="trust-item"><span class="trust-icon">01</span><span><strong>Comece pela aplicação</strong><small>Considere carga e operação</small></span></div>
+				<div class="trust-item"><span class="trust-icon">02</span><span><strong>Compare os modelos</strong><small>Veja entradas e descargas</small></span></div>
+				<div class="trust-item"><span class="trust-icon">03</span><span><strong>Confirme com a equipe</strong><small>Especifique sua necessidade</small></span></div>
+			</div>
+		</section>
+
+		<section class="products" id="produtos">
+			<div class="wrap">
+				<div class="section-heading"><div><div class="eyebrow">Compare as opções</div><h2>Modelos Big Bag</h2></div><p>Confira as características de cada modelo e teste o volume de grãos no simulador 3D.</p></div>
+				<div class="product-grid">
+					<article class="product-card" id="produto-saia" data-model="skirt">
+						<div class="product-photo"><img src="https://www.bigbagbandeirantes.com.br/img/produtos/bigbag-saia-superior.jpg" alt="Big Bag com saia superior" loading="lazy"><span class="product-number">01</span></div>
+						<div class="product-content"><span class="product-tag">Carga perigosa</span><h3>Com saia superior</h3><p>Saia para entrada da carga e válvula inferior para descarga. Indicada para produtos e resíduos perigosos.</p><button class="test-button" type="button">Testar este modelo <span aria-hidden="true">↗</span></button></div>
+					</article>
+					<article class="product-card" id="produto-valvulas" data-model="valves">
+						<div class="product-photo"><img src="https://www.bigbagbandeirantes.com.br/img/produtos/bigbag-valvulas.jpg" alt="Big Bag com válvulas superior e inferior" loading="lazy"><span class="product-number">02</span></div>
+						<div class="product-content"><span class="product-tag">Carga não perigosa</span><h3>Com válvulas</h3><p>Válvula superior para enchimento e válvula inferior para descarregar produtos e resíduos não perigosos.</p><button class="test-button" type="button">Testar este modelo <span aria-hidden="true">↗</span></button></div>
+					</article>
+					<article class="product-card" id="produto-travado" data-model="locked">
+						<div class="product-photo"><img src="https://www.bigbagbandeirantes.com.br/img/produtos/bigbag-travado.jpg" alt="Big Bag travado convencional" loading="lazy"><span class="product-number">03</span></div>
+						<div class="product-content"><span class="product-tag">Resinas e sementes</span><h3>Travado convencional</h3><p>Com válvulas para entrada e descarga. Recomendado para resinas e sementes; as travas ajudam a não soltar resíduos.</p><button class="test-button" type="button">Testar este modelo <span aria-hidden="true">↗</span></button></div>
+					</article>
+					
+				</div>
+
+				<section class="simulator" id="simulador" aria-label="Simulador 3D de Big Bag" aria-live="polite">
+					<div class="sim-head"><div><div class="eyebrow">Simulador 3D</div><h3 id="sim-title">Big Bag com válvulas</h3><p class="sim-model-description" id="sim-description">Válvula superior para enchimento e válvula inferior para descarga.</p><div class="sim-model-switch" role="group" aria-label="Trocar modelo de Big Bag"><button class="sim-model-button" type="button" data-sim-model="skirt" aria-pressed="false">Saia superior</button><button class="sim-model-button" type="button" data-sim-model="valves" aria-pressed="true">Com válvulas</button><button class="sim-model-button" type="button" data-sim-model="locked" aria-pressed="false">Travado</button></div></div><button class="close-sim" type="button" aria-label="Fechar simulador">×</button></div>
+					<div class="sim-layout">
+						<div class="scene-wrap" id="scene-wrap"><div class="scene-badge">Modelo interativo</div><span class="scene-help">Arraste para girar · role para aproximar</span></div>
+						<div class="sim-controls">
+							<label class="control-label" for="grain-amount">Quantidade de grãos</label>
+							<div class="quantity-value"><output id="amount-output" for="grain-amount">500 kg</output><small>limite ilustrativo: 2.000 kg</small></div>
+							<input id="grain-amount" type="range" min="500" max="2000" step="25" value="500" aria-label="Quantidade de grãos em quilogramas, de 500 a 2.000 kg">
+							<div class="range-labels"><span>500 kg</span><span>2.000 kg</span></div>
+							<div class="control-group"><label class="control-label" for="grain-type">Tipo de grão</label><select class="grain-select" id="grain-type"><option value="corn">Milho</option><option value="soy">Soja</option><option value="wheat">Trigo</option></select></div>
+							<div class="sim-spec"><span>Enchimento estimado</span><strong id="fill-output">55%</strong></div>
+							<div class="fill-meter" aria-hidden="true"><span id="fill-meter"></span></div>
+							<p class="sim-note">A visualização é ilustrativa. Capacidade e dimensões variam conforme o projeto; consulte nossa equipe para especificar sua carga.</p>
+							<a class="quote-link" id="quote-link" href="https://api.whatsapp.com/send?phone=5519981169539" target="_blank" rel="noreferrer">Solicitar este modelo <span aria-hidden="true">↗</span></a>
+						</div>
+					</div>
+				</section>
+			</div>
+		</section>
+
+		<section class="order-section" id="pedido" aria-labelledby="order-title">
+			<div class="wrap">
+				<div class="order-heading"><div class="eyebrow">Dados para orçamento</div><h2 id="order-title">Prepare seu pedido</h2><p>Informe o produto, as especificações do Big Bag e a quantidade de unidades. Os preços ficam em aberto e serão confirmados pela equipe no WhatsApp.</p></div>
+				<div class="order-layout">
+					<form class="order-form" id="order-form">
+						<div class="order-field order-field-wide"><label for="order-product">Qual produto será envasado?</label><select id="order-product" required><option value="" selected disabled>Selecione o produto</option><option>Grãos</option><option>Pó</option><option>Fertilizantes</option><option>Sementes</option><option value="other">Outros</option></select></div>
+						<div class="order-field order-field-wide" id="order-product-other-field" hidden><label for="order-product-other">Especifique o produto</label><input id="order-product-other" type="text" placeholder="Qual produto será envasado?"></div>
+						<fieldset class="order-field order-field-wide measure-group"><legend class="measure-legend">Qual a medida do Big Bag?</legend><label class="measure-unit" for="order-measure-preset">Base em centímetros × altura em metros</label><select id="order-measure-preset" required><option value="" selected disabled>Selecione uma medida</option><option value="90x90x1.00">90 × 90 × 1,00 m</option><option value="90x90x1.10">90 × 90 × 1,10 m</option><option value="90x90x1.20">90 × 90 × 1,20 m</option><option value="90x90x1.30">90 × 90 × 1,30 m</option><option value="90x90x1.40">90 × 90 × 1,40 m</option><option value="90x90x1.50">90 × 90 × 1,50 m</option><option value="90x90x1.60">90 × 90 × 1,60 m</option><option value="90x90x1.70">90 × 90 × 1,70 m</option><option value="90x90x1.80">90 × 90 × 1,80 m</option><option value="90x90x1.90">90 × 90 × 1,90 m</option><option value="90x90x2.00">90 × 90 × 2,00 m</option><option value="94x94x1.00">94 × 94 × 1,00 m</option><option value="94x94x1.10">94 × 94 × 1,10 m</option><option value="94x94x1.20">94 × 94 × 1,20 m</option><option value="94x94x1.30">94 × 94 × 1,30 m</option><option value="94x94x1.40">94 × 94 × 1,40 m</option><option value="94x94x1.50">94 × 94 × 1,50 m</option><option value="94x94x1.60">94 × 94 × 1,60 m</option><option value="94x94x1.70">94 × 94 × 1,70 m</option><option value="94x94x1.80">94 × 94 × 1,80 m</option><option value="94x94x1.90">94 × 94 × 1,90 m</option><option value="94x94x2.00">94 × 94 × 2,00 m</option><option value="99x99x1.00">99 × 99 × 1,00 m</option><option value="99x99x1.10">99 × 99 × 1,10 m</option><option value="99x99x1.20">99 × 99 × 1,20 m</option><option value="99x99x1.30">99 × 99 × 1,30 m</option><option value="99x99x1.40">99 × 99 × 1,40 m</option><option value="99x99x1.50">99 × 99 × 1,50 m</option><option value="99x99x1.60">99 × 99 × 1,60 m</option><option value="99x99x1.70">99 × 99 × 1,70 m</option><option value="99x99x1.80">99 × 99 × 1,80 m</option><option value="99x99x1.90">99 × 99 × 1,90 m</option><option value="99x99x2.00">99 × 99 × 2,00 m</option><option value="custom">Medida personalizada</option></select><div class="measure-custom" id="order-measure-custom" hidden><div class="measure-control"><label for="order-width">Largura da base (cm)</label><input id="order-width" type="number" min="1" step="0.1" inputmode="decimal" placeholder="90"></div><div class="measure-control"><label for="order-length">Comprimento da base (cm)</label><input id="order-length" type="number" min="1" step="0.1" inputmode="decimal" placeholder="90"></div><div class="measure-control"><label for="order-height">Altura (m)</label><input id="order-height" type="number" min="0.1" step="0.01" inputmode="decimal" placeholder="1,00"></div></div></fieldset>
+						<div class="order-field order-field-wide"><label for="order-model">Qual o modelo do Big Bag?</label><select id="order-model" required><option value="" selected disabled>Selecione o modelo</option><option>Válvula x Válvula</option><option>Saia x Válvula</option><option>Válvula x Fundo Fechado</option><option>Saia x Fundo Fechado</option><option value="other">Outros</option></select></div>
+						<div class="order-field order-field-wide" id="order-model-other-field" hidden><label for="order-model-other">Especifique o modelo</label><input id="order-model-other" type="text" placeholder="Descreva a configuração desejada"></div>
+						<div class="order-field"><label for="order-liner">Liner (plástico interno)</label><select id="order-liner" required><option value="" selected disabled>Selecione</option><option value="Sim">Sim</option><option value="Não">Não</option></select></div>
+						<div class="order-field"><label for="order-printing">Impressão</label><select id="order-printing" required><option value="" selected disabled>Selecione</option><option value="Sim">Sim</option><option value="Não">Não</option></select></div>
+						<div class="order-field"><label for="order-capacity">Quantos quilos serão envasados por Big Bag?</label><select id="order-capacity" required><option value="" selected disabled>Selecione o peso</option><option value="500">500 kg</option><option value="1000">1.000 kg</option><option value="1500">1.500 kg</option><option value="2000">2.000 kg</option></select></div>
+						<div class="order-field"><label for="order-quantity">Quantidade (unidades)</label><input id="order-quantity" type="number" min="300" step="1" value="300" inputmode="numeric" required></div>
+						<div class="order-field order-field-wide"><button class="order-add" type="button" id="add-order-line">Adicionar ao carrinho <span aria-hidden="true">+</span></button></div>
+						<div class="order-field"><label for="order-name">Seu nome</label><input id="order-name" name="name" autocomplete="name" placeholder="Nome e sobrenome" required></div>
+						<div class="order-field"><label for="order-phone">Seu WhatsApp</label><input id="order-phone" name="phone" type="tel" autocomplete="tel" placeholder="DDD + telefone" required></div>
+						<div class="order-field order-field-wide"><label for="order-company">Empresa (opcional)</label><input id="order-company" name="company" autocomplete="organization" placeholder="Nome da empresa"></div>
+						<div class="order-field order-field-wide"><label for="order-notes">Detalhes adicionais (opcional)</label><textarea id="order-notes" name="notes" placeholder="Conte um pouco mais sobre sua carga ou operação"></textarea></div>
+					</form>
+					<aside class="order-summary" aria-label="Resumo do pedido" aria-live="polite">
+						<h3>Seu carrinho</h3>
+						<div class="order-lines" id="order-lines"><p class="order-empty">Seu carrinho está vazio. Adicione um modelo para montar sua solicitação.</p></div>
+						<div class="order-total"><span>Total de unidades</span><strong id="order-total-quantity">0</strong></div>
+						<p class="order-minimum" id="order-minimum">Pedido mínimo: 300 unidades. Faltam 300 unidades.</p>
+						<div class="order-terms"><p><strong>Pagamento</strong>50% à vista e o restante em 7 dias. Pix ou boleto.</p><p><strong>Prazo de entrega</strong>15 dias úteis.</p></div>
+						<button class="order-send" id="send-order" type="submit" form="order-form" disabled>Enviar pedido pelo WhatsApp <span aria-hidden="true">↗</span></button>
+						<p class="order-disclaimer">Preço unitário e total do pedido: a informar pela equipe. O envio gera uma solicitação de orçamento, não uma compra ou cobrança automática.</p>
+					</aside>
+				</div>
+			</div>
+		</section>
+
+		<section class="about-band" id="empresa" aria-labelledby="about-title">
+			<div class="about-inner wrap">
+				<div class="about-intro">
+					<div class="about-identity"><svg class="brand-emblem-large" viewBox="0 0 760 260" role="img" aria-label="Logo Ouro Bag com símbolo e lettering dourado"><use href="#ouro-bag-wordmark"></use></svg><div class="about-copy"><h2 id="about-title">Sobre a Ouro Bag</h2></div></div>
+					<p>A Ouro Bag ajuda cada operação a identificar o modelo compatível com sua carga, considerando o tipo de produto, a forma de enchimento e a descarga.</p>
+				</div>
+				<div class="company-profile">
+					<h3>Nossa Empresa</h3>
+					<p>Com sede em Hortolândia, São Paulo, a Ouro Bag apresenta soluções em embalagens flexíveis para diferentes necessidades. Os modelos são pensados para facilitar o manuseio, a carga e a descarga. Nossa equipe pode ajudar a confirmar os requisitos de cada projeto.</p>
+				</div>
+				<div class="purpose-grid">
+					<article class="purpose-item"><span class="purpose-label">Nosso compromisso</span><h3>Missão</h3><p>Desenvolver e produzir produtos de qualidade, sendo pontual nas entregas, garantindo a satisfação dos clientes</p></article>
+					<article class="purpose-item"><span class="purpose-label">Onde queremos chegar</span><h3>Visão</h3><p>Estar sempre à frente no mercado em que atuamos, com qualidade e eficiência e sempre buscando novas tecnologias.</p></article>
+					<article class="purpose-item"><span class="purpose-label">O que nos orienta</span><h3>Valores</h3><p>Respeito e comprometimento com os clientes, colaboradores e ao meio ambiente.</p></article>
+				</div>
+			</div>
+		</section>
+	</main>
+	<footer><div class="footer-inner wrap"><span><strong>OURO BAG</strong> · O modelo certo para cada situação</span><span>Hortolândia · SP</span><div class="footer-links"><a href="#escolha">Encontre seu Ouro Bag</a><a href="https://api.whatsapp.com/send?phone=5519981169539" target="_blank" rel="noreferrer">Contato ↗</a></div></div></footer>
+	<a class="whatsapp-float" href="https://api.whatsapp.com/send?phone=5519981169539" target="_blank" rel="noreferrer" aria-label="Fale com a Ouro Bag pelo WhatsApp" title="Fale conosco pelo WhatsApp">
+		<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M16 3.5a12.3 12.3 0 0 0-10.6 18.5L4 28l6.2-1.6A12.3 12.3 0 1 0 16 3.5Z"/><path fill="currentColor" d="M11.2 9.2c.5-.6 1.2-.5 1.6 0l2.1 3.3c.3.5.2 1-.2 1.4l-1.1 1c.9 1.9 2.4 3.3 4.2 4.2l1-1.1c.4-.4.9-.5 1.4-.2l3.3 2.1c.5.3.6 1.1.1 1.6-.9 1-2.4 1.4-3.7 1.1-5.6-1.4-10-5.8-11.4-11.4-.3-1.3.1-2.7 1.1-3.7Z"/></svg>
+	</a>
+
+	<script type="module">
+		import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js";
+		import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/controls/OrbitControls.js";
+
+		const products = {
+			skirt: { title: "Ouro Bag com saia superior", note: "Saia ampla e aberta no topo para facilitar a entrada da carga; válvula inferior para descarga. Indicada para produtos e resíduos perigosos.", style: "skirt" },
+			valves: { title: "Ouro Bag com válvulas", note: "Bico superior para enchimento e bico inferior para descarga controlada de produtos e resíduos não perigosos.", style: "valves" },
+			locked: { title: "Ouro Bag travado convencional", note: "Formato mais reto, com válvula superior e inferior. Reforços nos cantos representam as travas para resinas e sementes, sem cobrir a janela frontal.", style: "locked" }
+		};
+		const recommendations = {
+			skirt: { title: "Ouro Bag com saia superior", reason: "Este modelo tem saia para entrada da carga e válvula inferior de descarga. É indicado no catálogo para produtos e resíduos perigosos.", image: "https://www.bigbagbandeirantes.com.br/img/produtos/bigbag-saia-superior.jpg", target: "#produto-saia", alt: "Ouro Bag com saia superior" },
+			valves: { title: "Ouro Bag com válvulas", reason: "A válvula superior permite o enchimento e a válvula inferior a descarga. O catálogo indica este modelo para produtos e resíduos não perigosos.", image: "https://www.bigbagbandeirantes.com.br/img/produtos/bigbag-valvulas.jpg", target: "#produto-valvulas", alt: "Ouro Bag com válvulas superior e inferior" },
+			locked: { title: "Ouro Bag travado convencional", reason: "O modelo travado é recomendado para resinas e sementes. As travas ajudam a evitar que resíduos escapem durante o manuseio.", image: "https://www.bigbagbandeirantes.com.br/img/produtos/bigbag-travado.jpg", target: "#produto-travado", alt: "Ouro Bag travado convencional" }
+		};
+		const grainColors = { corn: 0xd49b37, soy: 0x91a248, wheat: 0xc2a45c };
+		const sceneWrap = document.querySelector("#scene-wrap");
+		const simulator = document.querySelector("#simulador");
+		const amountInput = document.querySelector("#grain-amount");
+		const amountOutput = document.querySelector("#amount-output");
+		const fillOutput = document.querySelector("#fill-output");
+		const fillMeter = document.querySelector("#fill-meter");
+		const grainSelect = document.querySelector("#grain-type");
+		const cards = [...document.querySelectorAll(".product-card")];
+		const simulatorModelButtons = [...document.querySelectorAll(".sim-model-button")];
+		const situationButtons = [...document.querySelectorAll(".situation-option")];
+		const recommendationPanel = document.querySelector("#recommendation");
+		const orderForm = document.querySelector("#order-form");
+		const orderLinesElement = document.querySelector("#order-lines");
+		const orderProductSelect = document.querySelector("#order-product");
+		const orderProductOtherField = document.querySelector("#order-product-other-field");
+		const orderProductOtherInput = document.querySelector("#order-product-other");
+		const orderMeasureSelect = document.querySelector("#order-measure-preset");
+		const orderMeasureCustom = document.querySelector("#order-measure-custom");
+		const orderMeasureInputs = ["#order-width", "#order-length", "#order-height"].map(selector => document.querySelector(selector));
+		const orderModelSelect = document.querySelector("#order-model");
+		const orderModelOtherField = document.querySelector("#order-model-other-field");
+		const orderModelOtherInput = document.querySelector("#order-model-other");
+		const orderLinerSelect = document.querySelector("#order-liner");
+		const orderPrintingSelect = document.querySelector("#order-printing");
+		const orderCapacitySelect = document.querySelector("#order-capacity");
+		const orderQuantityInput = document.querySelector("#order-quantity");
+		const orderItems = [];
+		const heroCarousel = document.querySelector("#hero-carousel");
+		const heroSlides = [...heroCarousel.querySelectorAll(".hero-slide")];
+		const heroDots = [...heroCarousel.querySelectorAll(".hero-slide-dot")];
+		let heroSlideIndex = 0;
+		let heroSlideTimer;
+		let renderer, scene, camera, controls, bagGroup, grainBlock, kernels, animationId;
+		let activeModel = products.valves;
+		let resizeObserver;
+		let targetFillRatio = 0;
+		let sceneClock;
+
+		function showHeroSlide(index) {
+			heroSlideIndex = (index + heroSlides.length) % heroSlides.length;
+			heroSlides.forEach((slide, slideIndex) => {
+				const isActive = slideIndex === heroSlideIndex;
+				slide.classList.toggle("is-active", isActive);
+				slide.setAttribute("aria-hidden", String(!isActive));
+				slide.tabIndex = isActive ? 0 : -1;
+				heroDots[slideIndex].classList.toggle("is-active", isActive);
+				heroDots[slideIndex].setAttribute("aria-current", String(isActive));
+			});
+		}
+
+		function startHeroSlideTimer() {
+			clearInterval(heroSlideTimer);
+			if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+				heroSlideTimer = setInterval(() => showHeroSlide(heroSlideIndex + 1), 5000);
+			}
+		}
+
+		heroCarousel.querySelector(".previous").addEventListener("click", () => {
+			showHeroSlide(heroSlideIndex - 1);
+			startHeroSlideTimer();
+		});
+		heroCarousel.querySelector(".next").addEventListener("click", () => {
+			showHeroSlide(heroSlideIndex + 1);
+			startHeroSlideTimer();
+		});
+		heroDots.forEach((dot, index) => dot.addEventListener("click", () => {
+			showHeroSlide(index);
+			startHeroSlideTimer();
+		}));
+		heroCarousel.addEventListener("mouseenter", () => clearInterval(heroSlideTimer));
+		heroCarousel.addEventListener("mouseleave", startHeroSlideTimer);
+		startHeroSlideTimer();
+
+		function makeBag(style) {
+			if (bagGroup) {
+				scene.remove(bagGroup);
+				bagGroup.traverse(object => {
+					object.geometry?.dispose();
+					if (Array.isArray(object.material)) object.material.forEach(material => material.dispose());
+					else object.material?.dispose();
+				});
+			}
+			bagGroup = new THREE.Group();
+			const canvas = document.createElement("canvas");
+			canvas.width = canvas.height = 256;
+			const context = canvas.getContext("2d");
+			context.fillStyle = "#eeeadd";
+			context.fillRect(0, 0, 256, 256);
+			for (let index = 0; index < 256; index += 4) {
+				context.strokeStyle = index % 8 === 0 ? "rgba(120, 119, 99, .20)" : "rgba(255, 255, 255, .48)";
+				context.lineWidth = 1;
+				context.beginPath(); context.moveTo(index, 0); context.lineTo(index, 256); context.stroke();
+				context.beginPath(); context.moveTo(0, index); context.lineTo(256, index); context.stroke();
+			}
+			for (let index = 0; index < 90; index++) {
+				const x = (index * 73) % 256;
+				const y = (index * 131) % 256;
+				context.fillStyle = "rgba(132, 126, 99, .12)";
+				context.fillRect(x, y, 2, 2);
+			}
+			const fabricTexture = new THREE.CanvasTexture(canvas);
+			fabricTexture.wrapS = fabricTexture.wrapT = THREE.RepeatWrapping;
+			fabricTexture.repeat.set(2.5, 3.5);
+			fabricTexture.colorSpace = THREE.SRGBColorSpace;
+			const fabric = new THREE.MeshStandardMaterial({ map: fabricTexture, color: 0xf6f4e9, roughness: .94, metalness: 0, side: THREE.DoubleSide });
+			const windowFabric = new THREE.MeshStandardMaterial({ map: fabricTexture, color: 0xf6f4e9, roughness: .94, transparent: true, opacity: .24, depthWrite: false, side: THREE.DoubleSide });
+			const seamMaterial = new THREE.MeshStandardMaterial({ color: 0xb2aa91, roughness: .95 });
+			const tapeMaterial = new THREE.MeshStandardMaterial({ map: fabricTexture, color: 0xe6e1ce, roughness: .9 });
+			const grainMaterial = new THREE.MeshStandardMaterial({ color: grainColors[grainSelect.value], roughness: .86 });
+			const markCanvas = document.createElement("canvas");
+			markCanvas.width = markCanvas.height = 128;
+			const markContext = markCanvas.getContext("2d");
+			markContext.fillStyle = "#034a29";
+			markContext.strokeStyle = "#dca20c";
+			markContext.lineWidth = 5;
+			markContext.beginPath();
+			markContext.moveTo(33, 23); markContext.lineTo(95, 23); markContext.lineTo(91, 107); markContext.quadraticCurveTo(64, 121, 37, 107); markContext.closePath();
+			markContext.fill(); markContext.stroke();
+			markContext.fillStyle = "#dfa918";
+			markContext.beginPath(); markContext.arc(64, 62, 20, Math.PI, 0); markContext.lineTo(84, 62); markContext.closePath(); markContext.fill();
+			markContext.strokeStyle = "#dfa918";
+			markContext.lineWidth = 5;
+			markContext.beginPath(); markContext.moveTo(39, 68); markContext.quadraticCurveTo(62, 60, 89, 74); markContext.moveTo(38, 84); markContext.quadraticCurveTo(62, 78, 89, 94); markContext.moveTo(43, 101); markContext.quadraticCurveTo(62, 98, 82, 108); markContext.stroke();
+			markContext.strokeStyle = "#f4d26a";
+			markContext.lineWidth = 3;
+			markContext.lineCap = "round";
+			markContext.beginPath(); markContext.moveTo(64, 77); markContext.lineTo(64, 47); markContext.moveTo(64, 66); markContext.quadraticCurveTo(52, 64, 49, 54); markContext.moveTo(64, 60); markContext.quadraticCurveTo(76, 57, 79, 48); markContext.stroke();
+			const markTexture = new THREE.CanvasTexture(markCanvas);
+			markTexture.colorSpace = THREE.SRGBColorSpace;
+			const markMaterial = new THREE.MeshBasicMaterial({ map: markTexture, transparent: true, depthWrite: false, side: THREE.DoubleSide });
+
+			const bodyHeight = 2.15;
+			const bodyBase = .08;
+			const bodyHalfWidth = .82;
+			const bodyHalfDepth = .68;
+			const standardRings = [
+				{ y: 0, width: .9, depth: .91 },
+				{ y: .06, width: .97, depth: .97 },
+				{ y: .22, width: 1.01, depth: 1.02 },
+				{ y: .55, width: 1.055, depth: 1.065 },
+				{ y: 1.08, width: 1.08, depth: 1.075 },
+				{ y: 1.58, width: 1.055, depth: 1.045 },
+				{ y: 1.93, width: 1.01, depth: 1.005 },
+				{ y: 2.08, width: .96, depth: .97 },
+				{ y: 2.15, width: .9, depth: .92 }
+			];
+			const lockedRings = [
+				{ y: 0, width: .94, depth: .94 },
+				{ y: .06, width: .98, depth: .98 },
+				{ y: .22, width: 1, depth: 1 },
+				{ y: .55, width: 1, depth: 1 },
+				{ y: 1.08, width: 1, depth: 1 },
+				{ y: 1.58, width: 1, depth: 1 },
+				{ y: 1.93, width: 1, depth: 1 },
+				{ y: 2.08, width: .98, depth: .98 },
+				{ y: 2.15, width: .94, depth: .94 }
+			];
+			const bodyRings = style === "locked" ? lockedRings : standardRings;
+			const cornerExponent = style === "locked" ? .42 : .72;
+			const aroundSegments = 32;
+			const bodyVertices = [];
+			const bodyIndices = [];
+			const windowIndices = [];
+			const uvValues = [];
+			for (let ringIndex = 0; ringIndex < bodyRings.length; ringIndex++) {
+				const ring = bodyRings[ringIndex];
+				for (let segment = 0; segment <= aroundSegments; segment++) {
+					const angle = (segment / aroundSegments) * Math.PI * 2;
+					const cosine = Math.cos(angle);
+					const sine = Math.sin(angle);
+					const roundedX = Math.sign(cosine) * Math.pow(Math.abs(cosine), cornerExponent);
+					const roundedZ = Math.sign(sine) * Math.pow(Math.abs(sine), cornerExponent);
+					bodyVertices.push(roundedX * bodyHalfWidth * ring.width, bodyBase + ring.y, roundedZ * bodyHalfDepth * ring.depth);
+					uvValues.push(segment / aroundSegments, ring.y / bodyHeight);
+					if (ringIndex < bodyRings.length - 1 && segment < aroundSegments) {
+						const current = ringIndex * (aroundSegments + 1) + segment;
+						const next = current + aroundSegments + 1;
+						const indices = segment / aroundSegments * Math.PI * 2 > Math.PI * .22 && segment / aroundSegments * Math.PI * 2 < Math.PI * .78 ? windowIndices : bodyIndices;
+						indices.push(current, next, current + 1, next, next + 1, current + 1);
+					}
+				}
+			}
+			const bodyGeometry = new THREE.BufferGeometry();
+			bodyGeometry.setAttribute("position", new THREE.Float32BufferAttribute(bodyVertices, 3));
+			bodyGeometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvValues, 2));
+			bodyGeometry.setIndex([...bodyIndices, ...windowIndices]);
+			bodyGeometry.addGroup(0, bodyIndices.length, 0);
+			bodyGeometry.addGroup(bodyIndices.length, windowIndices.length, 1);
+			bodyGeometry.computeVertexNormals();
+			const body = new THREE.Mesh(bodyGeometry, [fabric, windowFabric]);
+			body.castShadow = body.receiveShadow = true;
+			bagGroup.add(body);
+			const bottomPanel = new THREE.Mesh(new THREE.RingGeometry(.27, .64, 32), fabric);
+			bottomPanel.rotation.x = Math.PI / 2;
+			bottomPanel.position.y = bodyBase + .015;
+			bagGroup.add(bottomPanel);
+			const topPanel = new THREE.Mesh(new THREE.RingGeometry(.32, .65, 32), fabric);
+			topPanel.rotation.x = -Math.PI / 2;
+			topPanel.position.y = bodyBase + bodyHeight - .01;
+			bagGroup.add(topPanel);
+
+			const grainFillGeometry = bodyGeometry.clone();
+			const grainFillPositions = grainFillGeometry.attributes.position;
+			for (let index = 0; index < grainFillPositions.count; index++) {
+				grainFillPositions.setXYZ(index, grainFillPositions.getX(index) * .82, grainFillPositions.getY(index) - bodyBase - bodyHeight / 2, grainFillPositions.getZ(index) * .8);
+			}
+			grainFillGeometry.computeVertexNormals();
+			grainBlock = new THREE.Mesh(grainFillGeometry, new THREE.MeshStandardMaterial({ color: grainColors[grainSelect.value], roughness: .92, transparent: true, opacity: .56, depthWrite: false, side: THREE.DoubleSide }));
+			grainBlock.renderOrder = 1;
+			grainBlock.userData.bodyBase = bodyBase;
+			grainBlock.userData.bodyHeight = bodyHeight;
+			grainBlock.position.y = bodyBase;
+			grainBlock.scale.y = 0;
+			bagGroup.add(grainBlock);
+			const kernelGeometry = new THREE.SphereGeometry(1, 10, 8);
+			kernels = new THREE.InstancedMesh(kernelGeometry, grainMaterial, 520);
+			kernels.renderOrder = 2;
+			const kernelPositions = [];
+			let seed = 28;
+			const random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+			for (let index = 0; index < 520; index++) {
+				const y = .14 + random() * (bodyHeight - .18);
+				const ring = bodyRings.find((item, itemIndex) => itemIndex > 0 && y <= item.y) ?? bodyRings[bodyRings.length - 1];
+				const width = bodyHalfWidth * ring.width * .88;
+				const depth = bodyHalfDepth * ring.depth * .88;
+				const angle = random() * Math.PI * 2;
+				const radius = Math.sqrt(random());
+				kernelPositions.push({ x: Math.cos(angle) * radius * width, y: bodyBase + y, z: Math.sin(angle) * radius * depth, scale: .026 + random() * .013, rotation: random() * Math.PI });
+			}
+			kernelPositions.sort((a, b) => a.y - b.y);
+			const dummy = new THREE.Object3D();
+			kernelPositions.forEach((point, index) => {
+				dummy.position.set(point.x, point.y, point.z);
+				dummy.rotation.set(point.rotation, point.rotation * .4, point.rotation * .25);
+				dummy.scale.set(point.scale * 1.55, point.scale * .72, point.scale);
+				dummy.updateMatrix();
+				kernels.setMatrixAt(index, dummy.matrix);
+				const shade = .82 + (index % 7) * .035;
+				kernels.setColorAt(index, new THREE.Color().setRGB(shade, shade * .97, shade * .88));
+			});
+			kernels.instanceMatrix.needsUpdate = true;
+			bagGroup.add(kernels);
+			const bagMark = new THREE.Mesh(new THREE.PlaneGeometry(.31, .31), markMaterial);
+			bagMark.position.set(-.42, bodyBase + bodyHeight - .3, bodyHalfDepth * 1.09);
+			bagMark.renderOrder = 3;
+			bagGroup.add(bagMark);
+
+			const spoutMaterial = new THREE.MeshStandardMaterial({ map: fabricTexture, color: 0xe9e5d6, roughness: .95, side: THREE.DoubleSide });
+			const lowerSpout = new THREE.Mesh(new THREE.CylinderGeometry(.24, .27, .48, 24, 1, true), spoutMaterial);
+			lowerSpout.position.y = -.16;
+			bagGroup.add(lowerSpout);
+			const spoutCord = new THREE.Mesh(new THREE.TorusGeometry(.26, .025, 8, 24), seamMaterial);
+			spoutCord.rotation.x = Math.PI / 2;
+			spoutCord.position.y = -.4;
+			bagGroup.add(spoutCord);
+
+			if (style === "skirt") {
+				const skirt = new THREE.Mesh(new THREE.CylinderGeometry(.76, .48, .82, 32, 2, true), fabric);
+				skirt.position.y = bodyBase + bodyHeight + .32;
+				bagGroup.add(skirt);
+				const skirtRim = new THREE.Mesh(new THREE.TorusGeometry(.76, .035, 8, 32), seamMaterial);
+				skirtRim.rotation.x = Math.PI / 2;
+				skirtRim.position.y = bodyBase + bodyHeight + .73;
+				bagGroup.add(skirtRim);
+				const skirtTie = new THREE.Mesh(new THREE.TorusGeometry(.49, .025, 7, 32), tapeMaterial);
+				skirtTie.rotation.x = Math.PI / 2;
+				skirtTie.position.y = bodyBase + bodyHeight + .04;
+				bagGroup.add(skirtTie);
+			} else {
+				const upperSpout = new THREE.Mesh(new THREE.CylinderGeometry(.27, .31, .57, 24, 1, true), spoutMaterial);
+				upperSpout.position.y = bodyBase + bodyHeight + .29;
+				bagGroup.add(upperSpout);
+				const upperRim = new THREE.Mesh(new THREE.TorusGeometry(.27, .025, 8, 24), seamMaterial);
+				upperRim.rotation.x = Math.PI / 2;
+				upperRim.position.y = bodyBase + bodyHeight + .58;
+				bagGroup.add(upperRim);
+			}
+			if (style === "locked") {
+				const lockMaterial = new THREE.MeshStandardMaterial({ color: 0xd4a52d, roughness: .8, metalness: .08 });
+				for (const sideX of [-1, 1]) {
+					for (const sideZ of [-1, 1]) {
+						const cornerReinforcement = new THREE.Mesh(new THREE.BoxGeometry(.075, bodyHeight * .88, .055), tapeMaterial);
+						cornerReinforcement.position.set(sideX * .73, bodyBase + bodyHeight / 2, sideZ * .57);
+						bagGroup.add(cornerReinforcement);
+						const lockTab = new THREE.Mesh(new THREE.BoxGeometry(.12, .17, .075), lockMaterial);
+						lockTab.position.set(sideX * .73, bodyBase + .74, sideZ * .6);
+						bagGroup.add(lockTab);
+					}
+				}
+			}
+
+			for (const angle of [Math.PI * .22, Math.PI * .78]) {
+				const seamPoints = bodyRings.map(ring => {
+					const cosine = Math.cos(angle), sine = Math.sin(angle);
+					const x = Math.sign(cosine) * Math.pow(Math.abs(cosine), cornerExponent);
+					const z = Math.sign(sine) * Math.pow(Math.abs(sine), cornerExponent);
+					return new THREE.Vector3(x * bodyHalfWidth * ring.width * 1.012, bodyBase + ring.y, z * bodyHalfDepth * ring.depth * 1.012);
+				});
+				const seam = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(seamPoints), 32, .012, 5, false), seamMaterial);
+				bagGroup.add(seam);
+			}
+			for (const x of [-.57, .57]) {
+				for (const zSide of [-1, 1]) {
+					const z = zSide * bodyHalfDepth * .72;
+					const insideX = x - Math.sign(x) * .2;
+					const loopPoints = [
+						new THREE.Vector3(x, bodyBase + bodyHeight - .035, z),
+						new THREE.Vector3(x, bodyBase + bodyHeight + .16, z),
+						new THREE.Vector3(x, bodyBase + bodyHeight + .4, z),
+						new THREE.Vector3((x + insideX) / 2, bodyBase + bodyHeight + .48, z),
+						new THREE.Vector3(insideX, bodyBase + bodyHeight + .4, z),
+						new THREE.Vector3(insideX, bodyBase + bodyHeight + .16, z),
+						new THREE.Vector3(insideX, bodyBase + bodyHeight - .035, z)
+					];
+					const loopCurve = new THREE.CatmullRomCurve3(loopPoints);
+					const loop = new THREE.Mesh(new THREE.TubeGeometry(loopCurve, 32, .045, 8, false), tapeMaterial);
+					bagGroup.add(loop);
+				}
+			}
+			bagGroup.scale.set(.42, .55, .42);
+			scene.add(bagGroup);
+			updateFill();
+		}
+
+		function updateQuoteLink() {
+			const grainName = grainSelect.options[grainSelect.selectedIndex].text;
+			const message = `Olá! Gostaria de um orçamento para: ${activeModel.title}. Simulação: ${amountInput.value} kg de ${grainName}.`;
+			document.querySelector("#quote-link").href = `https://api.whatsapp.com/send?phone=5519981169539&text=${encodeURIComponent(message)}`;
+		}
+
+		function updateFill() {
+			if (!kernels) return;
+			targetFillRatio = Number(amountInput.value) / 2000;
+			const color = grainColors[grainSelect.value];
+			kernels.material.color.setHex(color);
+			grainBlock.material.color.setHex(color);
+			amountOutput.value = `${amountInput.value} kg`;
+			fillOutput.textContent = `${Math.round(targetFillRatio * 100)}%`;
+			fillMeter.style.width = `${targetFillRatio * 100}%`;
+			updateQuoteLink();
+		}
+
+		function initScene() {
+			if (renderer) return;
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color(0xeee7d6);
+			scene.fog = new THREE.Fog(0xeee7d6, 8, 16);
+			camera = new THREE.PerspectiveCamera(34, 1, .1, 50);
+			camera.position.set(4.4, 3.5, 5.7);
+			renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+			renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+			renderer.shadowMap.enabled = true;
+			renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+			renderer.outputColorSpace = THREE.SRGBColorSpace;
+			sceneWrap.prepend(renderer.domElement);
+			controls = new OrbitControls(camera, renderer.domElement);
+			controls.target.set(0, 1.25, 0);
+			controls.enableDamping = true;
+			controls.minDistance = 3.8;
+			controls.maxDistance = 9;
+			controls.maxPolarAngle = Math.PI * .49;
+			sceneClock = new THREE.Clock();
+			scene.add(new THREE.HemisphereLight(0xffffff, 0x77816e, 2.1));
+			const keyLight = new THREE.DirectionalLight(0xffffff, 3.1);
+			keyLight.position.set(4, 7, 5);
+			keyLight.castShadow = true;
+			scene.add(keyLight);
+			const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: 0xeee7d6, roughness: 1 }));
+			floor.rotation.x = -Math.PI / 2;
+			floor.position.y = -.5;
+			floor.receiveShadow = true;
+			scene.add(floor);
+			resizeObserver = new ResizeObserver(resizeScene);
+			resizeObserver.observe(sceneWrap);
+			resizeScene();
+			const animate = () => {
+				animationId = requestAnimationFrame(animate);
+				const delta = Math.min(sceneClock.getDelta(), .05);
+				if (grainBlock && kernels) {
+					const currentRatio = grainBlock.scale.y;
+					const animatedRatio = THREE.MathUtils.damp(currentRatio, targetFillRatio, 7, delta);
+					grainBlock.scale.y = animatedRatio;
+					grainBlock.position.y = grainBlock.userData.bodyBase + grainBlock.userData.bodyHeight * animatedRatio / 2;
+					kernels.count = Math.round(520 * animatedRatio);
+					const targetWidth = .42 + .83 * Math.sqrt(animatedRatio);
+					const targetHeight = .55 + .6 * animatedRatio;
+					bagGroup.scale.x = THREE.MathUtils.damp(bagGroup.scale.x, targetWidth, 5, delta);
+					bagGroup.scale.z = THREE.MathUtils.damp(bagGroup.scale.z, targetWidth, 5, delta);
+					bagGroup.scale.y = THREE.MathUtils.damp(bagGroup.scale.y, targetHeight, 5, delta);
+				}
+				controls.update();
+				renderer.render(scene, camera);
+			};
+			animate();
+		}
+
+		function resizeScene() {
+			if (!renderer) return;
+			const width = sceneWrap.clientWidth;
+			const height = sceneWrap.clientHeight;
+			if (!width || !height) return;
+			renderer.setSize(width, height, false);
+			camera.aspect = width / height;
+			camera.updateProjectionMatrix();
+		}
+
+		function selectModel(modelKey, shouldScroll) {
+			const model = products[modelKey];
+			if (!model) return;
+			activeModel = model;
+			cards.forEach(item => item.classList.toggle("is-selected", item.dataset.model === modelKey));
+			simulatorModelButtons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.simModel === modelKey)));
+			document.querySelector("#sim-title").textContent = model.title;
+			document.querySelector("#sim-description").textContent = model.note;
+			simulator.classList.add("is-open");
+			initScene();
+			makeBag(model.style);
+			requestAnimationFrame(() => {
+				resizeScene();
+				if (shouldScroll) simulator.scrollIntoView({ behavior: "smooth", block: "start" });
+			});
+		}
+
+		function showRecommendation(modelKey) {
+			const recommendation = recommendations[modelKey];
+			if (!recommendation) return;
+			situationButtons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.situation === modelKey)));
+			document.querySelector("#recommendation-title").textContent = recommendation.title;
+			document.querySelector("#recommendation-reason").textContent = recommendation.reason;
+			document.querySelector("#recommendation-image").src = recommendation.image;
+			document.querySelector("#recommendation-image").alt = recommendation.alt;
+			document.querySelector("#recommendation-details").href = recommendation.target;
+			document.querySelector("#recommendation-test").dataset.model = modelKey;
+			recommendationPanel.hidden = false;
+		}
+
+		function renderOrderCart() {
+			const totalBags = orderItems.reduce((total, item) => total + item.quantity, 0);
+			orderLinesElement.replaceChildren();
+			if (orderItems.length === 0) {
+				const emptyMessage = document.createElement("p");
+				emptyMessage.className = "order-empty";
+				emptyMessage.textContent = "Seu carrinho está vazio. Adicione um modelo para montar sua solicitação.";
+				orderLinesElement.append(emptyMessage);
+			}
+			orderItems.forEach((item, index) => {
+				const line = document.createElement("div");
+				line.className = "order-line";
+				const details = document.createElement("div");
+				const title = document.createElement("h4");
+				title.textContent = item.model;
+				const specification = document.createElement("p");
+				specification.textContent = `${item.product} · ${item.measure} · ${item.capacity.toLocaleString("pt-BR")} kg por Big Bag · ${item.quantity.toLocaleString("pt-BR")} ${item.quantity === 1 ? "unidade" : "unidades"} · Liner: ${item.liner} · Impressão: ${item.printing}`;
+				details.append(title, specification);
+				const actions = document.createElement("div");
+				actions.className = "order-line-actions";
+				const price = document.createElement("span");
+				price.className = "order-line-price";
+				price.textContent = "Preço a informar";
+				const remove = document.createElement("button");
+				remove.className = "remove-order-line";
+				remove.type = "button";
+				remove.dataset.removeOrderItem = String(index);
+				remove.setAttribute("aria-label", `Remover ${item.model} do carrinho`);
+				remove.textContent = "×";
+				actions.append(price, remove);
+				line.append(details, actions);
+				orderLinesElement.append(line);
+			});
+
+			document.querySelector("#order-total-quantity").textContent = totalBags.toLocaleString("pt-BR");
+			document.querySelector("#nav-cart-count").textContent = totalBags.toLocaleString("pt-BR");
+			const minimumMessage = document.querySelector("#order-minimum");
+			const minimumMet = totalBags >= 300;
+			minimumMessage.classList.toggle("is-valid", minimumMet);
+			minimumMessage.textContent = minimumMet
+				? "Pedido mínimo de 300 unidades atingido."
+				: `Pedido mínimo: 300 unidades. Faltam ${(300 - totalBags).toLocaleString("pt-BR")} ${300 - totalBags === 1 ? "unidade" : "unidades"}.`;
+			document.querySelector("#send-order").disabled = !minimumMet;
+		}
+
+		function updateOtherOrderFields() {
+			const productIsOther = orderProductSelect.value === "other";
+			const modelIsOther = orderModelSelect.value === "other";
+			const measureIsCustom = orderMeasureSelect.value === "custom";
+			orderProductOtherField.hidden = !productIsOther;
+			orderProductOtherInput.required = productIsOther;
+			orderModelOtherField.hidden = !modelIsOther;
+			orderModelOtherInput.required = modelIsOther;
+			orderMeasureCustom.hidden = !measureIsCustom;
+			orderMeasureInputs.forEach(input => { input.required = measureIsCustom; });
+			if (!productIsOther) orderProductOtherInput.value = "";
+			if (!modelIsOther) orderModelOtherInput.value = "";
+			if (!measureIsCustom) orderMeasureInputs.forEach(input => { input.value = ""; });
+		}
+
+		orderProductSelect.addEventListener("change", updateOtherOrderFields);
+		orderModelSelect.addEventListener("change", updateOtherOrderFields);
+		orderMeasureSelect.addEventListener("change", updateOtherOrderFields);
+
+		document.querySelector("#add-order-line").addEventListener("click", () => {
+			updateOtherOrderFields();
+			updateOtherOrderFields();
+			const specificationFields = [orderProductSelect, orderProductOtherInput, orderMeasureSelect, ...orderMeasureInputs, orderModelSelect, orderModelOtherInput, orderLinerSelect, orderPrintingSelect, orderCapacitySelect, orderQuantityInput];
+			for (const field of specificationFields) {
+				if (field.required && !field.reportValidity()) return;
+			}
+			const quantity = Number(orderQuantityInput.value);
+			if (!Number.isSafeInteger(quantity) || quantity < 300) {
+				orderQuantityInput.setCustomValidity("A quantidade mínima é de 300 unidades por item.");
+				orderQuantityInput.reportValidity();
+				return;
+			}
+			orderQuantityInput.setCustomValidity("");
+			const product = orderProductSelect.value === "other" ? `Outros: ${orderProductOtherInput.value.trim()}` : orderProductSelect.options[orderProductSelect.selectedIndex].text;
+			const model = orderModelSelect.value === "other" ? `Outros: ${orderModelOtherInput.value.trim()}` : orderModelSelect.options[orderModelSelect.selectedIndex].text;
+			let measure;
+			if (orderMeasureSelect.value === "custom") {
+				const baseValues = orderMeasureInputs.slice(0, 2).map(input => new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 }).format(Number(input.value)));
+				const heightValue = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(orderMeasureInputs[2].value));
+				measure = `${baseValues[0]} × ${baseValues[1]} × ${heightValue} m`;
+			} else {
+				const [width, length, height] = orderMeasureSelect.value.split("x");
+				const heightValue = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(height));
+				measure = `${width} × ${length} × ${heightValue} m`;
+			}
+			orderItems.push({
+				product,
+				measure,
+				model,
+				liner: orderLinerSelect.value,
+				printing: orderPrintingSelect.value,
+				capacity: Number(orderCapacitySelect.value),
+				quantity
+			});
+			renderOrderCart();
+		});
+
+		orderLinesElement.addEventListener("click", event => {
+			const removeButton = event.target.closest("[data-remove-order-item]");
+			if (!removeButton) return;
+			orderItems.splice(Number(removeButton.dataset.removeOrderItem), 1);
+			renderOrderCart();
+		});
+
+		orderForm.addEventListener("submit", event => {
+			event.preventDefault();
+			const totalBags = orderItems.reduce((total, item) => total + item.quantity, 0);
+			if (totalBags < 300 || !orderForm.reportValidity()) {
+				document.querySelector("#order-minimum").focus?.();
+				return;
+			}
+			const formData = new FormData(orderForm);
+			const itemLines = orderItems.flatMap(item => [
+				`- ${item.quantity.toLocaleString("pt-BR")} ${item.quantity === 1 ? "unidade" : "unidades"} | ${item.model}`,
+				`  Produto envasado: ${item.product}`,
+				`  Medida: ${item.measure}`,
+				`  Liner: ${item.liner} | Impressão: ${item.printing}`,
+				`  Peso por Big Bag: ${item.capacity.toLocaleString("pt-BR")} kg | preço a cotar`
+			]);
+			const company = String(formData.get("company") || "").trim();
+			const notes = String(formData.get("notes") || "").trim();
+			const message = [
+				"Olá! Gostaria de solicitar um orçamento para Ouro Bag.",
+				"",
+				`Nome: ${String(formData.get("name")).trim()}`,
+				`WhatsApp: ${String(formData.get("phone")).trim()}`,
+				...(company ? [`Empresa: ${company}`] : []),
+				"",
+				"Itens do pedido (quantidade de unidades):",
+				...itemLines,
+				`Total: ${totalBags.toLocaleString("pt-BR")} unidades`,
+				"Preço: a informar pela equipe",
+				"",
+				"Condições informadas: 50% à vista e o restante em 7 dias, via Pix ou boleto. Prazo de entrega: 15 dias úteis.",
+				...(notes ? ["", `Detalhes da operação: ${notes}`] : [])
+			].join("\n");
+			const whatsappUrl = `https://api.whatsapp.com/send?phone=5519981169539&text=${encodeURIComponent(message)}`;
+			window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+		});
+		renderOrderCart();
+
+		cards.forEach(card => card.querySelector(".test-button").addEventListener("click", () => selectModel(card.dataset.model, true)));
+		simulatorModelButtons.forEach(button => button.addEventListener("click", () => selectModel(button.dataset.simModel, false)));
+		situationButtons.forEach(button => button.addEventListener("click", () => showRecommendation(button.dataset.situation)));
+		document.querySelector("#recommendation-test").addEventListener("click", event => selectModel(event.currentTarget.dataset.model, true));
+		amountInput.addEventListener("input", updateFill);
+		grainSelect.addEventListener("change", () => {
+			if (activeModel) makeBag(activeModel.style);
+		});
+		document.querySelector(".close-sim").addEventListener("click", () => {
+			simulator.classList.remove("is-open");
+			cards.forEach(card => card.classList.remove("is-selected"));
+			if (renderer) {
+				cancelAnimationFrame(animationId);
+				resizeObserver?.disconnect();
+				renderer.dispose();
+				renderer.domElement.remove();
+				renderer = scene = camera = controls = bagGroup = grainBlock = kernels = null;
+			}
+		});
+	</script>
+</body>
+</html>
